@@ -1,3 +1,6 @@
+# WebStorm IDE Generated files
+.idea/
+
 # Logs
 logs
 *.log

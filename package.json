@@ -1,0 +1,42 @@
+{
+  "name": "poi-islands-of-ireland-api",
+  "version": "1.0.0",
+  "description": "## A point of interest service api using Node and Hapi framework",
+  "main": "index.js",
+  "scripts": {
+    "star": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peter-dev/poi-islands-of-ireland-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peter-dev/poi-islands-of-ireland-api/issues"
+  },
+  "homepage": "https://github.com/peter-dev/poi-islands-of-ireland-api#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.5",
+    "boom": "^7.3.0",
+    "dotenv": "^7.0.0",
+    "hapi": "^18.1.0",
+    "hapi-swagger": "^9.4.2",
+    "inert": "^5.1.2",
+    "joi": "^14.3.1",
+    "mais-mongoose-seeder": "^1.0.7",
+    "mongoose": "^5.4.20",
+    "vision": "^5.4.4"
+  },
+  "devDependencies": {
+    "axios": "^0.18.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "prettier": "^1.16.4"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 120
+  }
+}
