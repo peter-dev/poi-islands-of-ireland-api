@@ -13,7 +13,7 @@ const userModel = Joi.object({
 }).label('User');
 
 const Users = {
-  find: {
+  findAll: {
     description: 'Get users',
     tags: ['api', 'users'],
     // configure http status codes for the endpoint
@@ -29,8 +29,8 @@ const Users = {
         }
       }
     },
-    handler: async function(request, reply) {
-      return await User.find();
+    handler: async function(request, h) {
+      return await User.find({});
     }
   },
 
@@ -57,7 +57,7 @@ const Users = {
           .description('the id of the user')
       }
     },
-    handler: async function(request, reply) {
+    handler: async function(request, h) {
       try {
         const user = await User.findOne({ _id: request.params.id });
         if (!user) {
@@ -96,12 +96,12 @@ const Users = {
         password: Joi.string().required()
       }
     },
-    handler: async function(request, reply) {
+    handler: async function(request, h) {
       const newUser = new User(request.payload);
       newUser.password = await User.hashPassword(request.payload.password);
       const user = await newUser.save();
       if (user) {
-        return reply.response(user).code(201);
+        return h.response(user).code(201);
       }
       return Boom.badImplementation('Error creating user');
     }
@@ -118,7 +118,7 @@ const Users = {
         }
       }
     },
-    handler: async function(request, reply) {
+    handler: async function(request, h) {
       await User.deleteMany({});
       return { success: true };
     }
@@ -144,7 +144,7 @@ const Users = {
           .description('the id of the user')
       }
     },
-    handler: async function(request, reply) {
+    handler: async function(request, h) {
       try {
         const user = await User.deleteOne({ _id: request.params.id });
         if (user) {
