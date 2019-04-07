@@ -6,6 +6,14 @@ class UsersService {
     this.baseUrl = baseUrl;
   }
 
+  async createUser(newUser) {
+    try {
+      return await axios.post(this.baseUrl + '/api/users', newUser);
+    } catch (e) {
+      return e.response;
+    }
+  }
+
   async getUsers() {
     try {
       return await axios.get(this.baseUrl + '/api/users');
@@ -22,9 +30,9 @@ class UsersService {
     }
   }
 
-  async createUser(newUser) {
+  async updateUser(id, updatedUser) {
     try {
-      return await axios.post(this.baseUrl + '/api/users', newUser);
+      return await axios.put(this.baseUrl + '/api/users/' + id, updatedUser);
     } catch (e) {
       return e.response;
     }

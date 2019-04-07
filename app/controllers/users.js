@@ -13,10 +13,52 @@ const userModel = Joi.object({
 }).label('User');
 
 const Users = {
-  findAll: {
-    description: 'Get users',
+  create: {
+    // swagger properties
+    description: 'Create new user',
     tags: ['api', 'users'],
-    // configure http status codes for the endpoint
+    plugins: {
+      'hapi-swagger': {
+        responses: {
+          '201': {
+            description: 'Success',
+            schema: userModel
+          },
+          '400': { description: 'Bad Request' },
+          '500': { description: 'Bad Implementation' }
+        }
+      }
+    },
+    // joi properties
+    validate: {
+      payload: {
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required(),
+        email: Joi.string()
+          .email()
+          .required(),
+        password: Joi.string().required()
+      }
+    },
+    handler: async function(request, h) {
+      try {
+        const newUser = new User(request.payload);
+        newUser.password = await User.hashPassword(request.payload.password);
+        const user = await newUser.save();
+        if (!user) {
+          return Boom.badImplementation('Error creating user');
+        }
+        return h.response(user).code(201);
+      } catch (err) {
+        return Boom.badRequest('Invalid request');
+      }
+    }
+  },
+
+  findAll: {
+    // swagger properties
+    description: 'Find all users',
+    tags: ['api', 'users'],
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -35,7 +77,8 @@ const Users = {
   },
 
   findOne: {
-    description: 'Get user by id',
+    // swagger properties
+    description: 'Find user by id',
     tags: ['api', 'users'],
     // configure http status codes for the endpoint
     plugins: {
@@ -50,6 +93,7 @@ const Users = {
         }
       }
     },
+    // joi properties
     validate: {
       params: {
         id: Joi.string()
@@ -59,7 +103,7 @@ const Users = {
     },
     handler: async function(request, h) {
       try {
-        const user = await User.findOne({ _id: request.params.id });
+        const user = await User.findById(request.params.id);
         if (!user) {
           return Boom.notFound('No User with this id');
         }
@@ -70,23 +114,31 @@ const Users = {
     }
   },
 
-  create: {
-    description: 'Add user',
+  update: {
+    // swagger properties
+    description: 'Update user by id',
     tags: ['api', 'users'],
     // configure http status codes for the endpoint
     plugins: {
       'hapi-swagger': {
         responses: {
-          '201': {
+          '200': {
             description: 'Success',
             schema: userModel
           },
           '400': { description: 'Bad Request' },
+          '404': { description: 'Not Found' },
           '500': { description: 'Bad Implementation' }
         }
       }
     },
+    // joi properties
     validate: {
+      params: {
+        id: Joi.string()
+          .required()
+          .description('the id of the user')
+      },
       payload: {
         firstName: Joi.string().required(),
         lastName: Joi.string().required(),
@@ -97,20 +149,36 @@ const Users = {
       }
     },
     handler: async function(request, h) {
-      const newUser = new User(request.payload);
-      newUser.password = await User.hashPassword(request.payload.password);
-      const user = await newUser.save();
-      if (user) {
-        return h.response(user).code(201);
+      try {
+        const user = await User.findById(request.params.id);
+        if (!user) {
+          return Boom.notFound('No User with this id');
+        }
+        // es6 syntax
+        const { firstName, lastName, email, password } = request.payload;
+        const attributes = {
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          password: password
+        };
+        attributes.password = await User.hashPassword(password);
+        // options: { new: true } return the modified document rather than the original
+        const updatedUser = User.findByIdAndUpdate(request.params.id, attributes, { new: true });
+        if (!updatedUser) {
+          return Boom.badImplementation('Error updating user');
+        }
+        return updatedUser;
+      } catch (err) {
+        return Boom.badRequest('Invalid request');
       }
-      return Boom.badImplementation('Error creating user');
     }
   },
 
   deleteAll: {
+    // swagger properties
     description: 'Delete users',
     tags: ['api', 'users'],
-    // configure http status codes for the endpoint
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -125,9 +193,9 @@ const Users = {
   },
 
   deleteOne: {
+    // swagger properties
     description: 'Delete user by id',
     tags: ['api', 'users'],
-    // configure http status codes for the endpoint
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -137,6 +205,7 @@ const Users = {
         }
       }
     },
+    // joi properties
     validate: {
       params: {
         id: Joi.string()
@@ -146,11 +215,11 @@ const Users = {
     },
     handler: async function(request, h) {
       try {
-        const user = await User.deleteOne({ _id: request.params.id });
-        if (user) {
-          return { success: true };
+        const user = await User.findByIdAndDelete(request.params.id);
+        if (!user) {
+          return Boom.notFound('No User with this id');
         }
-        return Boom.notFound('No User with this id');
+        return { success: true };
       } catch (err) {
         return Boom.badRequest('Invalid id');
       }

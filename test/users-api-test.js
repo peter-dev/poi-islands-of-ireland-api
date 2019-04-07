@@ -18,6 +18,18 @@ suite('Users api', function() {
     await usersService.deleteAllUsers();
   });
 
+  test('create user', async function() {
+    const response = await usersService.createUser(newUser);
+    assert.equal(response.status, 201);
+    assert.isDefined(response.data._id);
+  });
+
+  test('create invalid user', async function() {
+    const response = await usersService.createUser({});
+    assert.equal(response.status, 400);
+    assert.isUndefined(response.data._id);
+  });
+
   test('get all users', async function() {
     for (let u of users) {
       await usersService.createUser(u);
@@ -47,16 +59,18 @@ suite('Users api', function() {
     assert.equal(response2.status, 404);
   });
 
-  test('create user', async function() {
-    const response = await usersService.createUser(newUser);
-    assert.equal(response.status, 201);
-    assert.isDefined(response.data._id);
+  test('update user', async function() {
+    const responseCreate = await usersService.createUser(newUser);
+    const response = await usersService.updateUser(responseCreate.data._id, newUser);
+    assert.equal(response.status, 200);
+    assert.equal(responseCreate.data._id, response.data._id);
   });
 
-  test('create invalid user', async function() {
-    const response = await usersService.createUser({});
-    assert.equal(response.status, 400);
-    assert.isUndefined(response.data._id);
+  test('update invalid user', async function() {
+    const response1 = await usersService.updateUser('1234', newUser);
+    assert.equal(response1.status, 400);
+    const response2 = await usersService.updateUser('012345678901234567890123', newUser);
+    assert.equal(response2.status, 404);
   });
 
   test('delete all users', async function() {
