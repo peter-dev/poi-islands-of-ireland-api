@@ -10,8 +10,8 @@ const UserSchema = new Schema({
   password: String
 });
 // define static methods associated with a Schema
-UserSchema.statics.findByEmail = function(email) {
-  return this.findOne({ email: email });
+UserSchema.statics.findByEmail = async function(email) {
+  return await this.findOne({ email: email });
 };
 UserSchema.statics.hashPassword = async function(password) {
   const saltRounds = 10;

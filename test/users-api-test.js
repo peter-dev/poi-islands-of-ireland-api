@@ -7,21 +7,38 @@ const fixtures = require('./fixtures.json');
 suite('Users api', function() {
   let users = fixtures.users;
   let newUser = fixtures.newUser;
+  let authUser = fixtures.authUser;
 
   const usersService = new UsersService(fixtures.apiUrl);
 
   setup(async function() {
-    await usersService.deleteAllUsers();
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
   });
 
   teardown(async function() {
     await usersService.deleteAllUsers();
+    await usersService.clearAuth();
+  });
+
+  test('authenticate', async function () {
+    await usersService.createUser(newUser);
+    const response = await usersService.authenticate(newUser);
+    assert.equal(response.status, 201);
+    assert.isDefined(response.data.token);
   });
 
   test('create user', async function() {
     const response = await usersService.createUser(newUser);
     assert.equal(response.status, 201);
     assert.isDefined(response.data._id);
+  });
+
+  test('create user email exist', async function() {
+    await usersService.createUser(newUser);
+    const response = await usersService.createUser(newUser);
+    assert.equal(response.status, 400);
+    assert.isUndefined(response.data._id);
   });
 
   test('create invalid user', async function() {
@@ -36,13 +53,7 @@ suite('Users api', function() {
     }
     const response = await usersService.getUsers();
     assert.equal(response.status, 200);
-    assert.equal(response.data.length, users.length);
-  });
-
-  test('get all users empty', async function() {
-    const response = await usersService.getUsers();
-    assert.equal(response.status, 200);
-    assert.equal(response.data.length, 0);
+    assert.equal(response.data.length, users.length + 1);
   });
 
   test('get user', async function() {

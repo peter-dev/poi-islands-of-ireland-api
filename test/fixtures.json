@@ -25,5 +25,11 @@
     "lastName": "Simpson",
     "email": "maggie@simpson.com",
     "password": "secret"
+  },
+  "authUser": {
+    "firstName": "Piotr",
+    "lastName": "Baran",
+    "email": "piotr@baran.com",
+    "password": "secret"
   }
 }

@@ -2,6 +2,7 @@
 const Boom = require('boom');
 const Joi = require('joi');
 const User = require('../models/user');
+const Utils = require('./utils');
 
 // joi user schema for swagger documentation
 const userModel = Joi.object({
@@ -13,7 +14,53 @@ const userModel = Joi.object({
 }).label('User');
 
 const Users = {
+  authenticate: {
+    auth: false,
+    // swagger properties
+    description: 'Authenticate user',
+    tags: ['api', 'users'],
+    plugins: {
+      'hapi-swagger': {
+        responses: {
+          '201': {
+            description: 'Success',
+            schema: Joi.object({
+              success: Joi.boolean().valid(true).required(),
+              token: Joi.string().token().required()
+            }).label('Authentication')
+          },
+          '400': { description: 'Bad Request' },
+          '404': { description: 'Not Found' }
+        }
+      }
+    },
+    // joi properties
+    validate: {
+      payload: {
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required(),
+        email: Joi.string()
+          .email()
+          .required(),
+        password: Joi.string().required()
+      }
+    },
+    handler: async function(request, h) {
+      try {
+        const user = await User.findOne({ email: request.payload.email });
+        if (!user) {
+          return Boom.notFound('Authentication failed. User not found');
+        }
+        const token = Utils.generateToken(user);
+        return h.response({ success: true, token: token }).code(201);
+      } catch (err) {
+        return Boom.notFound('Internal db failure');
+      }
+    }
+  },
+
   create: {
+    auth: false,
     // swagger properties
     description: 'Create new user',
     tags: ['api', 'users'],
@@ -42,6 +89,10 @@ const Users = {
     },
     handler: async function(request, h) {
       try {
+        const existingUser = await User.findByEmail(request.payload.email);
+        if (existingUser) {
+          return Boom.badRequest('User with this email already exist');
+        }
         const newUser = new User(request.payload);
         newUser.password = await User.hashPassword(request.payload.password);
         const user = await newUser.save();
@@ -163,7 +214,7 @@ const Users = {
           password: password
         };
         attributes.password = await User.hashPassword(password);
-        // options: { new: true } return the modified document rather than the original
+        // options: { new: true } => return the modified document rather than the original
         const updatedUser = User.findByIdAndUpdate(request.params.id, attributes, { new: true });
         if (!updatedUser) {
           return Boom.badImplementation('Error updating user');
@@ -182,7 +233,12 @@ const Users = {
     plugins: {
       'hapi-swagger': {
         responses: {
-          '200': { description: 'Success' }
+          '200': {
+            description: 'Success',
+            schema: Joi.object({
+              success: Joi.boolean().valid(true).required()
+            }).label('DeleteAll')
+          }
         }
       }
     },
@@ -199,7 +255,12 @@ const Users = {
     plugins: {
       'hapi-swagger': {
         responses: {
-          '200': { description: 'Success' },
+          '200': {
+            description: 'Success',
+            schema: Joi.object({
+              success: Joi.boolean().valid(true).required()
+            }).label('DeleteOne')
+          },
           '400': { description: 'Bad Request' },
           '404': { description: 'Not Found' }
         }
