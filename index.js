@@ -57,7 +57,10 @@ const init = async function() {
     verifyOptions: { algorithms: ['HS256'] },
   });
 
-  server.auth.default('jwt');
+  server.auth.default({
+    mode: 'required',
+    strategy: 'jwt'
+  });
 
   server.route(Routes);
   await server.start();

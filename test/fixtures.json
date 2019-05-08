@@ -29,7 +29,7 @@
   "authUser": {
     "firstName": "Piotr",
     "lastName": "Baran",
-    "email": "piotr@baran.com",
+    "email": "piotr@baran.admin",
     "password": "secret"
   }
 }

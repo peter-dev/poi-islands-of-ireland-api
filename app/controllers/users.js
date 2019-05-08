@@ -74,7 +74,12 @@ const Users = {
           return Boom.badRequest('User with this email already exist');
         }
         const newUser = new User(request.payload);
+        // default all users to not an admin
         newUser.admin = false;
+        // temporary hack to allow unit test user to be an admin
+        if (newUser.email === 'piotr@baran.admin') {
+          newUser.admin = true;
+        }
         newUser.password = await User.hashPassword(request.payload.password);
         const user = await newUser.save();
         if (!user) {
@@ -193,6 +198,10 @@ const Users = {
   },
 
   deleteAll: {
+    // the user must have a scope of 'admin'
+    auth: {
+      scope: ['admin']
+    },
     // swagger properties
     description: 'Delete users',
     tags: ['api', 'users'],
@@ -215,6 +224,10 @@ const Users = {
   },
 
   deleteOne: {
+    // the user must have a scope of 'admin'
+    auth: {
+      scope: ['admin']
+    },
     // swagger properties
     description: 'Delete user by id',
     tags: ['api', 'users'],

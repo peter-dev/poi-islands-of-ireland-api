@@ -12,11 +12,12 @@ suite('Users api', function() {
   const usersService = new UsersService(fixtures.apiUrl);
 
   setup(async function() {
-    await usersService.createUser(authUser);
-    await usersService.authenticate(authUser);
+    // no initial setup
   });
 
   teardown(async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     await usersService.deleteAllUsers();
     await usersService.clearAuth();
   });
@@ -48,6 +49,8 @@ suite('Users api', function() {
   });
 
   test('get all users', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     for (let u of users) {
       await usersService.createUser(u);
     }
@@ -57,6 +60,8 @@ suite('Users api', function() {
   });
 
   test('get user', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const responseCreate = await usersService.createUser(newUser);
     const response = await usersService.getUser(responseCreate.data._id);
     assert.equal(response.status, 200);
@@ -64,6 +69,8 @@ suite('Users api', function() {
   });
 
   test('get invalid user', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const response1 = await usersService.getUser('1234');
     assert.equal(response1.status, 400);
     const response2 = await usersService.getUser('012345678901234567890123');
@@ -71,6 +78,8 @@ suite('Users api', function() {
   });
 
   test('update user', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const responseCreate = await usersService.createUser(newUser);
     const response = await usersService.updateUser(responseCreate.data._id, newUser);
     assert.equal(response.status, 200);
@@ -78,6 +87,8 @@ suite('Users api', function() {
   });
 
   test('update invalid user', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const response1 = await usersService.updateUser('1234', newUser);
     assert.equal(response1.status, 400);
     const response2 = await usersService.updateUser('012345678901234567890123', newUser);
@@ -85,6 +96,8 @@ suite('Users api', function() {
   });
 
   test('delete all users', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     for (let u of users) {
       await usersService.createUser(u);
     }
@@ -94,12 +107,16 @@ suite('Users api', function() {
   });
 
   test('delete all users empty', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const response = await usersService.deleteAllUsers();
     assert.equal(response.status, 200);
     assert.deepEqual(response.data, { success: true });
   });
 
   test('delete user', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const responseCreate = await usersService.createUser(newUser);
     const response = await usersService.deleteOneUser(responseCreate.data._id);
     assert.equal(response.status, 200);
@@ -107,7 +124,24 @@ suite('Users api', function() {
   });
 
   test('delete invalid user', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
     const response = await usersService.deleteOneUser('1234');
     assert.equal(response.status, 400);
+  });
+
+  test('delete all users forbidden', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
+    const response = await usersService.deleteAllUsers();
+    assert.equal(response.status, 403);
+  });
+
+  test('delete user forbidden', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
+    const responseCreate = await usersService.createUser(newUser);
+    const response = await usersService.deleteOneUser(responseCreate.data._id);
+    assert.equal(response.status, 403);
   });
 });
