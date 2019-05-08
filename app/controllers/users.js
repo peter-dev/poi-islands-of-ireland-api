@@ -2,16 +2,10 @@
 const Boom = require('boom');
 const Joi = require('joi');
 const User = require('../models/user');
+const ApiUserSchema = require('../schemas/user').ApiUserSchema;
+const ApiUserIdParamSchema = require('../schemas/user').ApiUserIdParamSchema;
+const SwaggerUserSchema = require('../schemas/user').SwaggerUserSchema;
 const Utils = require('./utils');
-
-// joi user schema for swagger documentation
-const userModel = Joi.object({
-  _id: Joi.string().required(),
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  email: Joi.string().required(),
-  password: Joi.string().required()
-}).label('User');
 
 const Users = {
   authenticate: {
@@ -34,16 +28,9 @@ const Users = {
         }
       }
     },
-    // joi properties
+    // validate the payload against the Joi schema
     validate: {
-      payload: {
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
-        email: Joi.string()
-          .email()
-          .required(),
-        password: Joi.string().required()
-      }
+      payload: ApiUserSchema
     },
     handler: async function(request, h) {
       try {
@@ -69,23 +56,16 @@ const Users = {
         responses: {
           '201': {
             description: 'Success',
-            schema: userModel
+            schema: SwaggerUserSchema
           },
           '400': { description: 'Bad Request' },
           '500': { description: 'Bad Implementation' }
         }
       }
     },
-    // joi properties
+    // validate the payload against the Joi schema
     validate: {
-      payload: {
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
-        email: Joi.string()
-          .email()
-          .required(),
-        password: Joi.string().required()
-      }
+      payload: ApiUserSchema
     },
     handler: async function(request, h) {
       try {
@@ -94,6 +74,7 @@ const Users = {
           return Boom.badRequest('User with this email already exist');
         }
         const newUser = new User(request.payload);
+        newUser.admin = false;
         newUser.password = await User.hashPassword(request.payload.password);
         const user = await newUser.save();
         if (!user) {
@@ -116,7 +97,7 @@ const Users = {
           '200': {
             description: 'Success',
             schema: Joi.array()
-              .items(userModel)
+              .items(SwaggerUserSchema)
               .label('Users')
           }
         }
@@ -137,7 +118,7 @@ const Users = {
         responses: {
           '200': {
             description: 'Success',
-            schema: userModel
+            schema: SwaggerUserSchema
           },
           '400': { description: 'Bad Request' },
           '404': { description: 'Not Found' }
@@ -146,11 +127,7 @@ const Users = {
     },
     // joi properties
     validate: {
-      params: {
-        id: Joi.string()
-          .required()
-          .description('the id of the user')
-      }
+      params: ApiUserIdParamSchema
     },
     handler: async function(request, h) {
       try {
@@ -175,7 +152,7 @@ const Users = {
         responses: {
           '200': {
             description: 'Success',
-            schema: userModel
+            schema: SwaggerUserSchema
           },
           '400': { description: 'Bad Request' },
           '404': { description: 'Not Found' },
@@ -183,21 +160,10 @@ const Users = {
         }
       }
     },
-    // joi properties
+    // validate the payload against the Joi schema
     validate: {
-      params: {
-        id: Joi.string()
-          .required()
-          .description('the id of the user')
-      },
-      payload: {
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
-        email: Joi.string()
-          .email()
-          .required(),
-        password: Joi.string().required()
-      }
+      params: ApiUserIdParamSchema,
+      payload: ApiUserSchema
     },
     handler: async function(request, h) {
       try {
@@ -268,11 +234,7 @@ const Users = {
     },
     // joi properties
     validate: {
-      params: {
-        id: Joi.string()
-          .required()
-          .description('the id of the user')
-      }
+      params: ApiUserIdParamSchema
     },
     handler: async function(request, h) {
       try {

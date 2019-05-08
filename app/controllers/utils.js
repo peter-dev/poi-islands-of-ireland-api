@@ -4,7 +4,13 @@ const Jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 exports.generateToken = function(user) {
-  return Jwt.sign({ id: user._id, email: user.email }, process.env.jwt_secret, {
+  // check if the user object passed in has admin set to true
+  let scopes;
+  if (user.admin) {
+    scopes = 'admin';
+  }
+  // sign the JWT
+  return Jwt.sign({ id: user._id, email: user.email, scope: scopes }, process.env.jwt_secret, {
     algorithm: 'HS256',
     expiresIn: '1h'
   });

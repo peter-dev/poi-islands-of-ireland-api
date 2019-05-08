@@ -7,7 +7,8 @@ const UserSchema = new Schema({
   firstName: String,
   lastName: String,
   email: String,
-  password: String
+  password: String,
+  admin: Boolean
 });
 // define static methods associated with a Schema
 UserSchema.statics.findByEmail = async function(email) {
