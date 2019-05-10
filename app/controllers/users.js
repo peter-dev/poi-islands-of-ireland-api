@@ -2,10 +2,8 @@
 const Boom = require('boom');
 const Joi = require('joi');
 const User = require('../models/user');
-const ApiUserSchema = require('../schemas/user').ApiUserSchema;
-const ApiUserIdParamSchema = require('../schemas/user').ApiUserIdParamSchema;
-const SwaggerUserSchema = require('../schemas/user').SwaggerUserSchema;
 const Utils = require('./utils');
+const { ApiUserSchema, ApiUserIdParamSchema, SwaggerUserSchema } = require('../schemas/user');
 
 const Users = {
   authenticate: {
@@ -19,8 +17,12 @@ const Users = {
           '201': {
             description: 'Success',
             schema: Joi.object({
-              success: Joi.boolean().valid(true).required(),
-              token: Joi.string().token().required()
+              success: Joi.boolean()
+                .valid(true)
+                .required(),
+              token: Joi.string()
+                .token()
+                .required()
             }).label('Authentication')
           },
           '400': { description: 'Bad Request' },
@@ -34,7 +36,7 @@ const Users = {
     },
     handler: async function(request, h) {
       try {
-        const user = await User.findOne({ email: request.payload.email });
+        const user = await User.findOne({ email: request.payload.email }).select('+admin');
         if (!user) {
           return Boom.notFound('Authentication failed. User not found');
         }
@@ -109,7 +111,7 @@ const Users = {
       }
     },
     handler: async function(request, h) {
-      return await User.find({});
+      return await User.find();
     }
   },
 
@@ -186,7 +188,7 @@ const Users = {
         };
         attributes.password = await User.hashPassword(password);
         // options: { new: true } => return the modified document rather than the original
-        const updatedUser = User.findByIdAndUpdate(request.params.id, attributes, { new: true });
+        const updatedUser = User.findOneAndUpdate({ _id: request.params.id }, attributes, { new: true });
         if (!updatedUser) {
           return Boom.badImplementation('Error updating user');
         }
@@ -211,7 +213,9 @@ const Users = {
           '200': {
             description: 'Success',
             schema: Joi.object({
-              success: Joi.boolean().valid(true).required()
+              success: Joi.boolean()
+                .valid(true)
+                .required()
             }).label('DeleteAll')
           }
         }
@@ -237,7 +241,9 @@ const Users = {
           '200': {
             description: 'Success',
             schema: Joi.object({
-              success: Joi.boolean().valid(true).required()
+              success: Joi.boolean()
+                .valid(true)
+                .required()
             }).label('DeleteOne')
           },
           '400': { description: 'Bad Request' },
@@ -251,7 +257,7 @@ const Users = {
     },
     handler: async function(request, h) {
       try {
-        const user = await User.findByIdAndDelete(request.params.id);
+        const user = await User.findOneAndDelete({ _id: request.params.id });
         if (!user) {
           return Boom.notFound('No User with this id');
         }

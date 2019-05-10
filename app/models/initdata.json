@@ -22,5 +22,48 @@
       "admin": false,
       "password": "$2a$10$uqnPlgyVjBEOtcgMhn/WRO3FwW4T9gX36tTB4RqpGeB/LkCR3YQuO"
     }
+  },
+  "regions": {
+    "_model": "Region",
+    "northEast": {
+      "name": "North East",
+      "identifier": "northEast",
+      "location": {
+        "lat": "54.700",
+        "lng": "-6.141"
+      }
+    },
+    "east": {
+      "name": "East Coast",
+      "identifier": "east",
+      "location": {
+        "lat": "53.306",
+        "lng": "-6.437"
+      }
+    },
+    "south": {
+      "name": "South Coast",
+      "identifier": "south",
+      "location": {
+        "lat": "51.851",
+        "lng": "-8.184"
+      }
+    },
+    "midWest": {
+      "name": "Mid West",
+      "identifier": "midWest",
+      "location": {
+        "lat": "53.574",
+        "lng": "-9.382"
+      }
+    },
+    "northWest": {
+      "name": "North West",
+      "identifier": "northWest",
+      "location": {
+        "lat": "54.821",
+        "lng": "-7.910"
+      }
+    }
   }
 }

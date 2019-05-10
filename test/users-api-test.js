@@ -3,13 +3,24 @@ const suite = require('mocha').suite;
 const assert = require('chai').assert;
 const UsersService = require('./users-service');
 const fixtures = require('./fixtures.json');
+const { init } = require('../server');
 
-suite('Users api', function() {
+suite('Users API endpoints', async function() {
   let users = fixtures.users;
   let newUser = fixtures.newUser;
   let authUser = fixtures.authUser;
 
-  const usersService = new UsersService(fixtures.apiUrl);
+  let server;
+  let usersService;
+
+  suiteSetup(async function() {
+    server = await init();
+    usersService = new UsersService(server);
+  });
+
+  suiteTeardown(async function() {
+    await server.stop();
+  });
 
   setup(async function() {
     // no initial setup
@@ -22,126 +33,144 @@ suite('Users api', function() {
     await usersService.clearAuth();
   });
 
-  test('authenticate', async function () {
+  test('POST /users/authenticate | valid user -> 201 Created', async function() {
     await usersService.createUser(newUser);
     const response = await usersService.authenticate(newUser);
-    assert.equal(response.status, 201);
-    assert.isDefined(response.data.token);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 201);
+    assert.isDefined(payload.token);
   });
 
-  test('create user', async function() {
+  test('POST /users/authenticate | invalid user -> 404 Not Found', async function() {
+    const response = await usersService.authenticate(newUser);
+    assert.equal(response.statusCode, 404);
+  });
+
+  test('POST /users | valid user -> 201 Created', async function() {
     const response = await usersService.createUser(newUser);
-    assert.equal(response.status, 201);
-    assert.isDefined(response.data._id);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 201);
+    assert.isDefined(payload._id);
   });
 
-  test('create user email exist', async function() {
+  test('POST /users | duplicate user -> 400 Bad Request', async function() {
     await usersService.createUser(newUser);
     const response = await usersService.createUser(newUser);
-    assert.equal(response.status, 400);
-    assert.isUndefined(response.data._id);
+    assert.equal(response.statusCode, 400);
   });
 
-  test('create invalid user', async function() {
+  test('POST /users | invalid user -> 400 Bad Request', async function() {
     const response = await usersService.createUser({});
-    assert.equal(response.status, 400);
-    assert.isUndefined(response.data._id);
+    assert.equal(response.statusCode, 400);
   });
 
-  test('get all users', async function() {
+  test('GET /users | all users -> 200 OK', async function() {
     await usersService.createUser(authUser);
     await usersService.authenticate(authUser);
     for (let u of users) {
       await usersService.createUser(u);
     }
     const response = await usersService.getUsers();
-    assert.equal(response.status, 200);
-    assert.equal(response.data.length, users.length + 1);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 200);
+    assert.equal(payload.length, users.length + 1);
   });
 
-  test('get user', async function() {
-    await usersService.createUser(authUser);
-    await usersService.authenticate(authUser);
+  test('GET /users/{id} | valid id -> 200 OK', async function() {
     const responseCreate = await usersService.createUser(newUser);
-    const response = await usersService.getUser(responseCreate.data._id);
-    assert.equal(response.status, 200);
-    assert.deepEqual(responseCreate.data, response.data);
+    const payloadCreate = JSON.parse(responseCreate.payload);
+    await usersService.authenticate(newUser);
+    const response = await usersService.getUser(payloadCreate._id);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 200);
+    assert.deepOwnInclude(payloadCreate, payload);
   });
 
-  test('get invalid user', async function() {
-    await usersService.createUser(authUser);
-    await usersService.authenticate(authUser);
-    const response1 = await usersService.getUser('1234');
-    assert.equal(response1.status, 400);
-    const response2 = await usersService.getUser('012345678901234567890123');
-    assert.equal(response2.status, 404);
+  test('GET /users/{id} | invalid id -> 400 Bad Request', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
+    const response = await usersService.getUser('1234');
+    assert.equal(response.statusCode, 400);
   });
 
-  test('update user', async function() {
-    await usersService.createUser(authUser);
-    await usersService.authenticate(authUser);
+  test('GET /users/{id} | invalid id -> 404 Not Found', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
+    const response = await usersService.getUser('012345678901234567890123');
+    assert.equal(response.statusCode, 404);
+  });
+
+  test('PUT /users/{id} | valid user -> 200 OK', async function() {
     const responseCreate = await usersService.createUser(newUser);
-    const response = await usersService.updateUser(responseCreate.data._id, newUser);
-    assert.equal(response.status, 200);
-    assert.equal(responseCreate.data._id, response.data._id);
+    const payloadCreate = JSON.parse(responseCreate.payload);
+    await usersService.authenticate(newUser);
+    const response = await usersService.updateUser(payloadCreate._id, newUser);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 200);
+    assert.equal(payloadCreate._id, payload._id);
   });
 
-  test('update invalid user', async function() {
-    await usersService.createUser(authUser);
-    await usersService.authenticate(authUser);
-    const response1 = await usersService.updateUser('1234', newUser);
-    assert.equal(response1.status, 400);
-    const response2 = await usersService.updateUser('012345678901234567890123', newUser);
-    assert.equal(response2.status, 404);
+  test('PUT /users/{id} | invalid user -> 400 Bad Request', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
+    const response = await usersService.updateUser('1234', newUser);
+    assert.equal(response.statusCode, 400);
   });
 
-  test('delete all users', async function() {
+  test('PUT /users/{id} | invalid user -> 404 Not Found', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
+    const response = await usersService.updateUser('012345678901234567890123', newUser);
+    assert.equal(response.statusCode, 404);
+  });
+
+  test('DELETE /users | all users -> 200 OK', async function() {
     await usersService.createUser(authUser);
     await usersService.authenticate(authUser);
     for (let u of users) {
       await usersService.createUser(u);
     }
     const response = await usersService.deleteAllUsers();
-    assert.equal(response.status, 200);
-    assert.deepEqual(response.data, { success: true });
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 200);
+    assert.deepEqual(payload, { success: true });
   });
 
-  test('delete all users empty', async function() {
-    await usersService.createUser(authUser);
-    await usersService.authenticate(authUser);
+  test('DELETE /users | all users -> 403 Forbidden', async function() {
+    await usersService.createUser(newUser);
+    await usersService.authenticate(newUser);
     const response = await usersService.deleteAllUsers();
-    assert.equal(response.status, 200);
-    assert.deepEqual(response.data, { success: true });
+    assert.equal(response.statusCode, 403);
   });
 
-  test('delete user', async function() {
-    await usersService.createUser(authUser);
+  test('DELETE /users/{id} | valid id -> 200 OK', async function() {
+    const responseCreate = await usersService.createUser(authUser);
+    const payloadCreate = JSON.parse(responseCreate.payload);
     await usersService.authenticate(authUser);
-    const responseCreate = await usersService.createUser(newUser);
-    const response = await usersService.deleteOneUser(responseCreate.data._id);
-    assert.equal(response.status, 200);
-    assert.deepEqual(response.data, { success: true });
+    const response = await usersService.deleteOneUser(payloadCreate._id);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 200);
+    assert.deepEqual(payload, { success: true });
   });
 
-  test('delete invalid user', async function() {
+  test('DELETE /users/{id} | invalid id -> 400 Bad Request', async function() {
     await usersService.createUser(authUser);
     await usersService.authenticate(authUser);
     const response = await usersService.deleteOneUser('1234');
-    assert.equal(response.status, 400);
+    assert.equal(response.statusCode, 400);
   });
 
-  test('delete all users forbidden', async function() {
-    await usersService.createUser(newUser);
-    await usersService.authenticate(newUser);
-    const response = await usersService.deleteAllUsers();
-    assert.equal(response.status, 403);
+  test('DELETE /users/{id} | invalid id -> 404 Not Found', async function() {
+    await usersService.createUser(authUser);
+    await usersService.authenticate(authUser);
+    const response = await usersService.deleteOneUser('012345678901234567890123');
+    assert.equal(response.statusCode, 404);
   });
 
-  test('delete user forbidden', async function() {
+  test('DELETE /users/{id} | valid id -> 403 Forbidden', async function() {
     await usersService.createUser(newUser);
     await usersService.authenticate(newUser);
-    const responseCreate = await usersService.createUser(newUser);
-    const response = await usersService.deleteOneUser(responseCreate.data._id);
-    assert.equal(response.status, 403);
+    const response = await usersService.deleteOneUser('012345678901234567890123');
+    assert.equal(response.statusCode, 403);
   });
 });

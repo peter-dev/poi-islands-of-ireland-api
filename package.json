@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "star": "node index.js",
-    "test": "mocha -u tdd"
+    "test": "mocha --ui tdd --exit --timeout 5000"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/peter-dev/poi-islands-of-ireland-api#readme",
   "dependencies": {
-    "bcrypt": "^3.0.5",
+    "@hapi/hapi": "^18.3.1",
+    "bcrypt": "^3.0.6",
     "boom": "^7.3.0",
     "dotenv": "^7.0.0",
     "hapi": "^18.1.0",
@@ -33,9 +34,9 @@
     "vision": "^5.4.4"
   },
   "devDependencies": {
-    "axios": "^0.18.0",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
+    "nyc": "^14.1.1",
     "prettier": "^1.16.4"
   },
   "prettier": {

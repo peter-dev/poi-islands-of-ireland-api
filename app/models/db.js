@@ -1,29 +1,35 @@
 'use strict';
 // import .env
 require('dotenv').config();
-
 const Mongoose = require('mongoose');
-// connect to the database service
-Mongoose.connect(process.env.db, { useNewUrlParser: true });
-const db = Mongoose.connection;
 
 async function seed() {
-  var seeder = require('mais-mongoose-seeder')(Mongoose);
+  let seeder = require('mais-mongoose-seeder')(Mongoose);
   const data = require('./initdata.json');
   const User = require('./user');
+  const Region = require('./region');
   const dbData = await seeder.seed(data, { dropDatabase: false, dropCollections: true });
-  //console.log(dbData);
+  console.log(dbData);
 }
-// log fail
-db.on('error', function(err) {
-  console.log(`database connection error: ${err}`);
-});
-// log disconnect
-db.on('disconnected', function() {
-  console.log('database disconnected');
-});
-// log success
-db.once('open', function() {
-  console.log(`database connected to ${this.name} on ${this.host}`);
-  seed();
-});
+
+// connect to the database service
+exports.connectToDb = function(shouldSeed) {
+  Mongoose.connect(process.env.db, { useNewUrlParser: true });
+  const db = Mongoose.connection;
+  // log fail
+  db.on('error', function(err) {
+    console.log(`database connection error: ${err}`);
+  });
+  // log disconnect
+  db.on('disconnected', function() {
+    console.log('database disconnected');
+  });
+  // log success
+  db.once('open', function() {
+    console.log(`database connected to ${this.name} on ${this.host}`);
+    if (shouldSeed) {
+      seed();
+    }
+  });
+};
+

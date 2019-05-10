@@ -1,71 +1,91 @@
 'use strict';
-const axios = require('axios');
-
+// define service class
 class UsersService {
-  constructor(baseUrl) {
-    this.baseUrl = baseUrl;
+  constructor(server) {
+    this.server = server;
+    this.usersEndpoint = '/api/users';
+    this.headers = {
+      Authorization: ''
+    };
+  }
+
+  setAuth(token) {
+    this.headers.Authorization = 'Bearer ' + token;
+  }
+
+  clearAuth() {
+    this.headers.Authorization = '';
   }
 
   async authenticate(user) {
-    try {
-      const response = await axios.post(this.baseUrl + '/api/users/authenticate', user);
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
-      return response;
-    } catch (e) {
-      return e.response;
-    }
+    const postRequest = {
+      method: 'post',
+      url: this.usersEndpoint + '/authenticate',
+      payload: user,
+      headers: this.headers
+    };
+    const response = await this.server.inject(postRequest);
+    // retrieve token from payload
+    const payload = JSON.parse(response.payload);
+    this.setAuth(payload.token);
+    // return original response
+    return response;
   }
 
-  async clearAuth() {
-    axios.defaults.headers.common['Authorization'] = '';
-  }
-
-  async createUser(newUser) {
-    try {
-      return await axios.post(this.baseUrl + '/api/users', newUser);
-    } catch (e) {
-      return e.response;
-    }
+  async createUser(user) {
+    const postRequest = {
+      method: 'post',
+      url: this.usersEndpoint,
+      payload: user,
+      headers: this.headers
+    };
+    return await this.server.inject(postRequest);
   }
 
   async getUsers() {
-    try {
-      return await axios.get(this.baseUrl + '/api/users');
-    } catch (e) {
-      return e.response;
-    }
+    const getRequest = {
+      method: 'get',
+      url: this.usersEndpoint,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
   }
 
   async getUser(id) {
-    try {
-      return await axios.get(this.baseUrl + '/api/users/' + id);
-    } catch (e) {
-      return e.response;
-    }
+    const getRequest = {
+      method: 'get',
+      url: this.usersEndpoint + '/' + id,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
   }
 
-  async updateUser(id, updatedUser) {
-    try {
-      return await axios.put(this.baseUrl + '/api/users/' + id, updatedUser);
-    } catch (e) {
-      return e.response;
-    }
+  async updateUser(id, user) {
+    const putRequest = {
+      method: 'put',
+      url: this.usersEndpoint + '/' + id,
+      payload: user,
+      headers: this.headers
+    };
+    return await this.server.inject(putRequest);
   }
 
   async deleteAllUsers() {
-    try {
-      return await axios.delete(this.baseUrl + '/api/users');
-    } catch (e) {
-      return e.response;
-    }
+    const deleteRequest = {
+      method: 'delete',
+      url: this.usersEndpoint,
+      headers: this.headers
+    };
+    return await this.server.inject(deleteRequest);
   }
 
   async deleteOneUser(id) {
-    try {
-      return await axios.delete(this.baseUrl + '/api/users/' + id);
-    } catch (e) {
-      return e.response;
-    }
+    const deleteRequest = {
+      method: 'delete',
+      url: this.usersEndpoint + '/' + id,
+      headers: this.headers
+    };
+    return await this.server.inject(deleteRequest);
   }
 }
 

@@ -6,15 +6,19 @@ const SwaggerUserSchema = Joi.object({
   _id: Joi.string().required(),
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().required()
+  email: Joi.string().required(),
+  password: Joi.string().required(),
+  createdAt: Joi.date().required(),
+  updatedAt: Joi.date().required()
 }).label('User');
 
 // joi user schema for api validation
 const ApiUserSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
-  email: Joi.string().email().required(),
+  email: Joi.string()
+    .email()
+    .required(),
   password: Joi.string().required()
 });
 
@@ -24,7 +28,6 @@ const ApiUserIdParamSchema = Joi.object({
     .required()
     .description('the id of the user')
 });
-
 
 module.exports = {
   SwaggerUserSchema,

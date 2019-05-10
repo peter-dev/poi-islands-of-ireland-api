@@ -1,5 +1,6 @@
 'use strict';
 const Users = require('./app/controllers/users');
+const Regions = require('./app/controllers/regions');
 
 module.exports = [
   { method: 'POST', path: '/api/users/authenticate', config: Users.authenticate },
@@ -9,5 +10,7 @@ module.exports = [
   { method: 'PUT', path: '/api/users/{id}', config: Users.update },
   { method: 'DELETE', path: '/api/users', config: Users.deleteAll },
   { method: 'DELETE', path: '/api/users/{id}', config: Users.deleteOne },
+
+  { method: 'GET', path: '/api/regions', config: Regions.findAll },
 
 ];

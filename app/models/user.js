@@ -3,13 +3,16 @@ const BCrypt = require('bcrypt');
 const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 // define mongoose user schema
-const UserSchema = new Schema({
-  firstName: String,
-  lastName: String,
-  email: String,
-  password: String,
-  admin: Boolean
-});
+const UserSchema = new Schema(
+  {
+    firstName: String,
+    lastName: String,
+    email: String,
+    password: String,
+    admin: { type: Boolean, select: false } // no select
+  },
+  { timestamps: true }
+);
 // define static methods associated with a Schema
 UserSchema.statics.findByEmail = async function(email) {
   return await this.findOne({ email: email });
