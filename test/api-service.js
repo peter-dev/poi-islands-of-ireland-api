@@ -1,9 +1,10 @@
 'use strict';
 // define service class
-class UsersService {
+class ApiService {
   constructor(server) {
     this.server = server;
     this.usersEndpoint = '/api/users';
+    this.regionsEndpoint = '/api/regions';
     this.headers = {
       Authorization: ''
     };
@@ -87,6 +88,24 @@ class UsersService {
     };
     return await this.server.inject(deleteRequest);
   }
+
+  async getRegions() {
+    const getRequest = {
+      method: 'get',
+      url: this.regionsEndpoint,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
+  }
+
+  async getRegion(id) {
+    const getRequest = {
+      method: 'get',
+      url: this.regionsEndpoint + '/' + id,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
+  }
 }
 
-module.exports = UsersService;
+module.exports = ApiService;

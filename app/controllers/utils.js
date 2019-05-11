@@ -17,17 +17,6 @@ exports.generateToken = function(user) {
   });
 };
 
-exports.decodeToken = function(token) {
-  let userInfo = {};
-  try {
-    let decoded = Jwt.verify(token, process.env.jwt_secret);
-    userInfo.userId = decoded.id;
-    userInfo.email = decoded.email;
-  } catch (e) {}
-
-  return userInfo;
-};
-
 exports.validate = async function(decoded, request) {
   const user = await User.findOne({ _id: decoded.id });
   if (!user) {
@@ -35,17 +24,4 @@ exports.validate = async function(decoded, request) {
   } else {
     return { isValid: true };
   }
-};
-
-exports.getUserIdFromRequest = function(request) {
-  let userId = null;
-  try {
-    const authorization = request.headers.authorization;
-    const token = authorization.split(' ')[1];
-    const decodedToken = Jwt.verify(token, process.env.jwt_secret);
-    userId = decodedToken.id;
-  } catch (e) {
-    userId = null;
-  }
-  return userId;
 };

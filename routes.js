@@ -12,5 +12,5 @@ module.exports = [
   { method: 'DELETE', path: '/api/users/{id}', config: Users.deleteOne },
 
   { method: 'GET', path: '/api/regions', config: Regions.findAll },
-
+  { method: 'GET', path: '/api/regions/{id}', config: Regions.findOne }
 ];

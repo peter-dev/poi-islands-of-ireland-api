@@ -70,7 +70,7 @@ const configure = async function() {
 
 // initialize the server
 exports.init = async function() {
-  connectToDb(false);
+  await connectToDb(false);
   await configure();
   await server.initialize();
   return server;
@@ -78,7 +78,7 @@ exports.init = async function() {
 
 // start the server
 exports.start = async function() {
-  connectToDb(true);
+  await connectToDb(true);
   await configure();
   await server.start();
   console.log(`Server running at: ${server.info.uri}`);

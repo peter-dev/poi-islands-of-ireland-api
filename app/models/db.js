@@ -9,11 +9,11 @@ async function seed() {
   const User = require('./user');
   const Region = require('./region');
   const dbData = await seeder.seed(data, { dropDatabase: false, dropCollections: true });
-  console.log(dbData);
+  //console.log(dbData);
 }
 
 // connect to the database service
-exports.connectToDb = function(shouldSeed) {
+exports.connectToDb = async function(shouldSeed) {
   Mongoose.connect(process.env.db, { useNewUrlParser: true });
   const db = Mongoose.connection;
   // log fail
@@ -32,4 +32,3 @@ exports.connectToDb = function(shouldSeed) {
     }
   });
 };
-

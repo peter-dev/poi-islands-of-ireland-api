@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "star": "node index.js",
-    "test": "mocha --ui tdd --exit --timeout 5000"
+    "test": "npm run test:regions && npm run test:users",
+    "test:regions": "mocha --ui tdd --exit --timeout 5000 test/regions-api-test.js",
+    "test:users": "mocha --ui tdd --exit --timeout 5000 test/users-api-test.js",
+    "cover": "npm run cover:regions && npm run cover:users && npm run cover:report",
+    "cover:regions": "nyc --silent mocha --ui tdd --exit --timeout 5000 test/regions-api-test.js",
+    "cover:users": "nyc --silent --no-clean mocha --ui tdd --exit --timeout 5000 test/users-api-test.js",
+    "cover:report": "nyc report --reporter=lcov --reporter=text"
   },
   "repository": {
     "type": "git",

@@ -119,7 +119,6 @@ const Users = {
     // swagger properties
     description: 'Find user by id',
     tags: ['api', 'users'],
-    // configure http status codes for the endpoint
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -132,7 +131,7 @@ const Users = {
         }
       }
     },
-    // joi properties
+    // validate the parameters against the Joi schema
     validate: {
       params: ApiUserIdParamSchema
     },
@@ -153,7 +152,6 @@ const Users = {
     // swagger properties
     description: 'Update user by id',
     tags: ['api', 'users'],
-    // configure http status codes for the endpoint
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -167,7 +165,7 @@ const Users = {
         }
       }
     },
-    // validate the payload against the Joi schema
+    // validate the payload and parameters against the Joi schema
     validate: {
       params: ApiUserIdParamSchema,
       payload: ApiUserSchema
@@ -251,7 +249,7 @@ const Users = {
         }
       }
     },
-    // joi properties
+    // validate the parameters against the Joi schema
     validate: {
       params: ApiUserIdParamSchema
     },

@@ -16,6 +16,14 @@ const SwaggerRegionSchema = Joi.object({
   updatedAt: Joi.date().required()
 }).label('Region');
 
+// joi id param schema for api validation
+const ApiRegionIdParamSchema = Joi.object({
+  id: Joi.string()
+    .required()
+    .description('the id of the region')
+});
+
 module.exports = {
-  SwaggerRegionSchema
+  SwaggerRegionSchema,
+  ApiRegionIdParamSchema
 };
