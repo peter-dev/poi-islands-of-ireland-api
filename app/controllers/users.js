@@ -1,6 +1,6 @@
 'use strict';
-const Boom = require('boom');
-const Joi = require('joi');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
 const User = require('../models/user');
 const Utils = require('./utils');
 const { ApiUserSchema, ApiUserIdParamSchema, SwaggerUserSchema } = require('../schemas/user');
@@ -40,10 +40,14 @@ const Users = {
         if (!user) {
           return Boom.notFound('Authentication failed. User not found');
         }
+        const isValidPassword = await user.comparePassword(request.payload.password);
+        if (!isValidPassword) {
+          return Boom.unauthorized('Authentication failed. Password mismatch');
+        }
         const token = Utils.generateToken(user);
         return h.response({ success: true, token: token }).code(201);
       } catch (err) {
-        return Boom.notFound('Internal db failure');
+        return Boom.badRequest('Invalid request');
       }
     }
   },
@@ -79,7 +83,7 @@ const Users = {
         // default all users to not an admin
         newUser.admin = false;
         // temporary hack to allow unit test user to be an admin
-        if (newUser.email === 'piotr@baran.admin') {
+        if (newUser.email === 'piotr@baran.com') {
           newUser.admin = true;
         }
         newUser.password = await User.hashPassword(request.payload.password);
@@ -192,7 +196,7 @@ const Users = {
         }
         return updatedUser;
       } catch (err) {
-        return Boom.badRequest('Invalid request');
+        return Boom.badRequest('Invalid id');
       }
     }
   },
@@ -204,7 +208,7 @@ const Users = {
     },
     // swagger properties
     description: 'Delete users',
-    tags: ['api', 'users'],
+    tags: ['api', 'users', 'admin'],
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -214,7 +218,7 @@ const Users = {
               success: Joi.boolean()
                 .valid(true)
                 .required()
-            }).label('DeleteAll')
+            }).label('Response')
           }
         }
       }
@@ -232,7 +236,7 @@ const Users = {
     },
     // swagger properties
     description: 'Delete user by id',
-    tags: ['api', 'users'],
+    tags: ['api', 'users', 'admin'],
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -242,7 +246,7 @@ const Users = {
               success: Joi.boolean()
                 .valid(true)
                 .required()
-            }).label('DeleteOne')
+            }).label('Response')
           },
           '400': { description: 'Bad Request' },
           '404': { description: 'Not Found' }

@@ -8,8 +8,9 @@ async function seed() {
   const data = require('./initdata.json');
   const User = require('./user');
   const Region = require('./region');
+  const Island = require('./island');
   const dbData = await seeder.seed(data, { dropDatabase: false, dropCollections: true });
-  //console.log(dbData);
+  console.log(dbData);
 }
 
 // connect to the database service

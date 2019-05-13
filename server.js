@@ -9,18 +9,29 @@ if (result.error) {
 }
 // import required modules
 const Hapi = require('@hapi/hapi');
-const Inert = require('inert');
-const Vision = require('vision');
+const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
 const HapiSwagger = require('hapi-swagger');
 const HapiAuthJwt2 = require('hapi-auth-jwt2');
 const Pack = require('./package');
 const Routes = require('./routes');
 const Utils = require('./app/controllers/utils');
 
-// create a server with a host and port
+// create a server with a host and port and global validation handling
 const server = Hapi.server({
   host: 'localhost',
-  port: 3000
+  port: 3000,
+  routes: {
+    validate: {
+      options: {
+        abortEarly: false
+      },
+      failAction: async function(request, h, err) {
+        //console.error('Validation Error:', err.message);
+        throw err;
+      }
+    }
+  }
 });
 
 // import database connection
@@ -32,7 +43,9 @@ const swaggerOptions = {
     title: 'POI Islands of Ireland API Documentation',
     version: Pack.version
   },
+  tags: [{ name: 'users' }, { name: 'regions' }, { name: 'islands' }, { name: 'admin' }],
   grouping: 'tags',
+  sortEndpoints: 'method',
   securityDefinitions: {
     jwt: {
       type: 'apiKey',

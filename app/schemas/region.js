@@ -1,5 +1,5 @@
 'use strict';
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 // joi region schema for swagger documentation
 const SwaggerRegionSchema = Joi.object({
@@ -7,11 +7,9 @@ const SwaggerRegionSchema = Joi.object({
   name: Joi.string().required(),
   identifier: Joi.string().required(),
   location: Joi.object({
-    lat: Joi.number().precision(8).required(),
-    lng: Joi.number().precision(8).required()
-  })
-    .label('Location')
-    .required(),
+    lat: Joi.number().required(),
+    lng: Joi.number().required()
+  }).label('Location').required(),
   createdAt: Joi.date().required(),
   updatedAt: Joi.date().required()
 }).label('Region');
@@ -19,6 +17,8 @@ const SwaggerRegionSchema = Joi.object({
 // joi id param schema for api validation
 const ApiRegionIdParamSchema = Joi.object({
   id: Joi.string()
+    .alphanum()
+    .max(24)
     .required()
     .description('the id of the region')
 });

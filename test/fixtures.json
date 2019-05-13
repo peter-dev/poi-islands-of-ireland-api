@@ -29,7 +29,16 @@
   "authUser": {
     "firstName": "Piotr",
     "lastName": "Baran",
-    "email": "piotr@baran.admin",
+    "email": "piotr@baran.com",
     "password": "secret"
+  },
+  "newIsland": {
+    "name": "Black Rock Island",
+    "description": "Black Rock G598-401 Sheet 16 2.5km W of Deadman’s Point, this is a major lighthouse on a minor piece of rock. ",
+    "location": {
+      "lat": "54.30810138",
+      "lng": "-8.61832983"
+    },
+    "createdBy" : ""
   }
 }

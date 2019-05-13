@@ -23,7 +23,10 @@ suite('Users API endpoints', function() {
   });
 
   setup(async function() {
-    // no initial setup
+    await apiService.createUser(authUser);
+    await apiService.authenticate(authUser);
+    await apiService.deleteAllUsers();
+    apiService.clearAuth();
   });
 
   teardown(async function() {
@@ -39,6 +42,13 @@ suite('Users API endpoints', function() {
     const payload = JSON.parse(response.payload);
     assert.equal(response.statusCode, 201);
     assert.isDefined(payload.token);
+  });
+
+  test('POST /users/authenticate | password mismatch -> 401 Unauthorized', async function() {
+    await apiService.createUser(newUser);
+    const modifiedPasswordUser = Object.assign({}, newUser, {password: 'incorrect'});
+    const response = await apiService.authenticate(modifiedPasswordUser);
+    assert.equal(response.statusCode, 401);
   });
 
   test('POST /users/authenticate | invalid user -> 404 Not Found', async function() {
@@ -65,8 +75,8 @@ suite('Users API endpoints', function() {
   });
 
   test('GET /users | all users -> 200 OK', async function() {
-    await apiService.createUser(authUser);
-    await apiService.authenticate(authUser);
+    await apiService.createUser(newUser);
+    await apiService.authenticate(newUser);
     for (let u of users) {
       await apiService.createUser(u);
     }
@@ -84,6 +94,19 @@ suite('Users API endpoints', function() {
     const payload = JSON.parse(response.payload);
     assert.equal(response.statusCode, 200);
     assert.deepOwnInclude(payloadCreate, payload);
+  });
+
+  test('GET /users/{id} | valid id -> 401 Unauthorized', async function() {
+    const response = await apiService.getUser('012345678901234567890123');
+    assert.equal(response.statusCode, 401);
+  });
+
+  test('GET /users/{id} | valid id -> 401 Invalid Credentials', async function() {
+    await apiService.createUser(authUser);
+    await apiService.authenticate(authUser);
+    await apiService.deleteAllUsers();
+    const response = await apiService.getUser('012345678901234567890123');
+    assert.equal(response.statusCode, 401);
   });
 
   test('GET /users/{id} | invalid id -> 400 Bad Request', async function() {
@@ -111,13 +134,21 @@ suite('Users API endpoints', function() {
   });
 
   test('PUT /users/{id} | invalid user -> 400 Bad Request', async function() {
+    const responseCreate = await apiService.createUser(newUser);
+    const payloadCreate = JSON.parse(responseCreate.payload);
+    await apiService.authenticate(newUser);
+    const response = await apiService.updateUser(payloadCreate._id, {});
+    assert.equal(response.statusCode, 400);
+  });
+
+  test('PUT /users/{id} | invalid user id -> 400 Bad Request', async function() {
     await apiService.createUser(newUser);
     await apiService.authenticate(newUser);
     const response = await apiService.updateUser('1234', newUser);
     assert.equal(response.statusCode, 400);
   });
 
-  test('PUT /users/{id} | invalid user -> 404 Not Found', async function() {
+  test('PUT /users/{id} | invalid user id -> 404 Not Found', async function() {
     await apiService.createUser(newUser);
     await apiService.authenticate(newUser);
     const response = await apiService.updateUser('012345678901234567890123', newUser);

@@ -5,6 +5,8 @@ class ApiService {
     this.server = server;
     this.usersEndpoint = '/api/users';
     this.regionsEndpoint = '/api/regions';
+    this.islandsEndpoint = '/api/islands';
+    this.regionsAndIslandsEndpoint = '/api/regions/{regionId}/islands';
     this.headers = {
       Authorization: ''
     };
@@ -102,6 +104,62 @@ class ApiService {
     const getRequest = {
       method: 'get',
       url: this.regionsEndpoint + '/' + id,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
+  }
+
+  async createIsland(island, regionId) {
+    const postRequest = {
+      method: 'post',
+      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId),
+      payload: island,
+      headers: this.headers
+    };
+    return await this.server.inject(postRequest);
+  }
+
+  async getIslands() {
+    const getRequest = {
+      method: 'get',
+      url: this.islandsEndpoint,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
+  }
+
+  async getIslandsByRegion(regionId) {
+    const getRequest = {
+      method: 'get',
+      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId),
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
+  }
+
+  async updateIsland(island, regionId, islandId) {
+    const putRequest = {
+      method: 'put',
+      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId) + "/" + islandId,
+      payload: island,
+      headers: this.headers
+    };
+    return await this.server.inject(putRequest);
+  }
+
+  async deleteAllIslands() {
+    const deleteRequest = {
+      method: 'delete',
+      url: this.islandsEndpoint,
+      headers: this.headers
+    };
+    return await this.server.inject(deleteRequest);
+  }
+
+  async deleteIslandsByRegion(regionId) {
+    const getRequest = {
+      method: 'delete',
+      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId),
       headers: this.headers
     };
     return await this.server.inject(getRequest);

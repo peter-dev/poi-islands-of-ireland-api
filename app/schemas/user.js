@@ -1,5 +1,5 @@
 'use strict';
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 // joi user schema for swagger documentation
 const SwaggerUserSchema = Joi.object({
@@ -14,17 +14,28 @@ const SwaggerUserSchema = Joi.object({
 
 // joi user schema for api validation
 const ApiUserSchema = Joi.object({
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
+  firstName: Joi.string()
+    .min(2)
+    .max(30)
+    .required(),
+  lastName: Joi.string()
+    .min(2)
+    .max(30)
+    .required(),
   email: Joi.string()
     .email()
     .required(),
-  password: Joi.string().required()
-});
+  password: Joi.string()
+    .min(2)
+    .max(30)
+    .required()
+}).label('New User');
 
 // joi id param schema for api validation
 const ApiUserIdParamSchema = Joi.object({
   id: Joi.string()
+    .alphanum()
+    .max(24)
     .required()
     .description('the id of the user')
 });

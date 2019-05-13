@@ -1,6 +1,6 @@
 'use strict';
-const Boom = require('boom');
-const Joi = require('joi');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
 const Region = require('../models/region');
 const { SwaggerRegionSchema, ApiRegionIdParamSchema } = require('../schemas/region');
 
@@ -48,11 +48,11 @@ const Regions = {
     },
     handler: async function(request, h) {
       try {
-        const user = await Region.findById(request.params.id);
-        if (!user) {
+        const region = await Region.findById(request.params.id);
+        if (!region) {
           return Boom.notFound('No Region with this id');
         }
-        return user;
+        return region;
       } catch (err) {
         return Boom.badRequest('Invalid id');
       }

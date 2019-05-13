@@ -14,22 +14,20 @@ suite('Regions API endpoints', function() {
   suiteSetup(async function() {
     server = await init();
     apiService = new ApiService(server);
-    await apiService.createUser(authUser);
-    await apiService.authenticate(authUser);
   });
 
   suiteTeardown(async function() {
-    await apiService.deleteAllUsers();
-    apiService.clearAuth();
     await server.stop();
   });
 
   setup(async function() {
-    // no initial setup
+    await apiService.createUser(authUser);
+    await apiService.authenticate(authUser);
   });
 
   teardown(async function() {
-    // no clean up
+    await apiService.deleteAllUsers();
+    apiService.clearAuth();
   });
 
   test('GET /regions | all regions -> 200 OK', async function() {
@@ -40,9 +38,9 @@ suite('Regions API endpoints', function() {
   });
 
   test('GET /regions/{id} | valid id -> 200 OK', async function() {
-    const responseAll = await apiService.getRegions();
-    const payloadAll = JSON.parse(responseAll.payload);
-    const id = payloadAll[0]._id;
+    const responseRegions = await apiService.getRegions();
+    const payloadRegions = JSON.parse(responseRegions.payload);
+    const id = payloadRegions[0]._id;
     const response = await apiService.getRegion(id);
     const payload = JSON.parse(response.payload);
     assert.equal(response.statusCode, 200);
