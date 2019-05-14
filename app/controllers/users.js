@@ -190,7 +190,7 @@ const Users = {
         };
         attributes.password = await User.hashPassword(password);
         // options: { new: true } => return the modified document rather than the original
-        const updatedUser = User.findOneAndUpdate({ _id: request.params.id }, attributes, { new: true });
+        const updatedUser = await User.findOneAndUpdate({ _id: request.params.id }, attributes, { new: true });
         if (!updatedUser) {
           return Boom.badImplementation('Error updating user');
         }

@@ -52,8 +52,18 @@ const ApiRegionIslandIdParamSchema = Joi.object({
     .description('the id of the island')
 });
 
+// joi id param schema for api validation
+const ApiIslandIdParamSchema = Joi.object({
+  id: Joi.string()
+    .alphanum()
+    .max(24)
+    .required()
+    .description('the id of the island')
+});
+
 module.exports = {
   SwaggerIslandSchema,
   ApiIslandSchema,
-  ApiRegionIslandIdParamSchema
+  ApiRegionIslandIdParamSchema,
+  ApiIslandIdParamSchema
 };

@@ -1,5 +1,4 @@
 {
-  "apiUrl": "http://localhost:3000",
   "users": [
     {
       "firstName": "Homer",
@@ -40,5 +39,10 @@
       "lng": "-8.61832983"
     },
     "createdBy" : ""
+  },
+  "newRating": {
+    "score": 0,
+    "island": "",
+    "user": ""
   }
 }

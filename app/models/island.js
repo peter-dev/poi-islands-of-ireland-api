@@ -21,5 +21,6 @@ const IslandSchema = Schema(
   },
   { timestamps: true }
 );
+
 // define and export 'Island' model compiled from Schema definition
 module.exports = Mongoose.model('Island', IslandSchema);

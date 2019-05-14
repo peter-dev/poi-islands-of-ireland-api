@@ -5,14 +5,16 @@
   "main": "index.js",
   "scripts": {
     "star": "node index.js",
-    "test": "npm run test:users && npm run test:regions && npm run test:islands",
+    "test": "npm run test:users && npm run test:regions && npm run test:islands && npm run test:ratings",
     "test:users": "mocha --ui tdd --exit --timeout 10000 test/users-api-test.js",
     "test:regions": "mocha --ui tdd --exit --timeout 10000 test/regions-api-test.js",
     "test:islands": "mocha --ui tdd --exit --timeout 10000 test/islands-api-test.js",
-    "cover": "npm run cover:users && npm run cover:regions && npm run cover:islands && npm run cover:report",
+    "test:ratings": "mocha --ui tdd --exit --timeout 10000 test/ratings-api-test.js",
+    "cover": "npm run cover:users && npm run cover:regions && npm run cover:islands && npm run cover:ratings && npm run cover:report",
     "cover:users": "nyc --silent mocha --ui tdd --exit --timeout 10000 test/users-api-test.js",
     "cover:regions": "nyc --silent --no-clean mocha --ui tdd --exit --timeout 10000 test/regions-api-test.js",
     "cover:islands": "nyc --silent --no-clean mocha --ui tdd --exit --timeout 10000 test/islands-api-test.js",
+    "cover:ratings": "nyc --silent --no-clean mocha --ui tdd --exit --timeout 10000 test/ratings-api-test.js",
     "cover:report": "nyc report --reporter=lcov --reporter=text"
   },
   "repository": {

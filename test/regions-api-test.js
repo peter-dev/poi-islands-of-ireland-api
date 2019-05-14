@@ -21,39 +21,39 @@ suite('Regions API endpoints', function() {
   });
 
   setup(async function() {
-    await apiService.createUser(authUser);
+    await apiService.createResource(apiService.usersEndpoint, authUser);
     await apiService.authenticate(authUser);
   });
 
   teardown(async function() {
-    await apiService.deleteAllUsers();
+    await apiService.deleteAllResources(apiService.usersEndpoint);
     apiService.clearAuth();
   });
 
   test('GET /regions | all regions -> 200 OK', async function() {
-    const response = await apiService.getRegions();
+    const response = await apiService.getAllResources(apiService.regionsEndpoint);
     const payload = JSON.parse(response.payload);
     assert.equal(response.statusCode, 200);
     assert.equal(payload.length, 5);
   });
 
   test('GET /regions/{id} | valid id -> 200 OK', async function() {
-    const responseRegions = await apiService.getRegions();
+    const responseRegions = await apiService.getAllResources(apiService.regionsEndpoint);
     const payloadRegions = JSON.parse(responseRegions.payload);
     const id = payloadRegions[0]._id;
-    const response = await apiService.getRegion(id);
+    const response = await apiService.getResource(apiService.regionsEndpoint, id);
     const payload = JSON.parse(response.payload);
     assert.equal(response.statusCode, 200);
     assert.equal(id, payload._id);
   });
 
   test('GET /regions/{id} | invalid id -> 400 Bad Request', async function() {
-    const response = await apiService.getRegion('1234');
+    const response = await apiService.getResource(apiService.regionsEndpoint,'1234');
     assert.equal(response.statusCode, 400);
   });
 
-  test('GET /regions/{id} | invalid id -> 404 Not Found', async function() {
-    const response = await apiService.getRegion('012345678901234567890123');
+  test('GET /regions/{id} | valid id -> 404 Not Found', async function() {
+    const response = await apiService.getResource(apiService.regionsEndpoint,'012345678901234567890123');
     assert.equal(response.statusCode, 404);
   });
 });

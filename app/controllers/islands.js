@@ -144,7 +144,7 @@ const Islands = {
           location: location
         };
         // options: { new: true } => return the modified document rather than the original
-        const updatedIsland = Island.findOneAndUpdate({ _id: request.params.island_id }, attributes, { new: true });
+        const updatedIsland = await Island.findOneAndUpdate({ _id: request.params.island_id }, attributes, { new: true });
         if (!updatedIsland) {
           return Boom.badImplementation('Error updating island');
         }

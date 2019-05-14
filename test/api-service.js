@@ -6,7 +6,10 @@ class ApiService {
     this.usersEndpoint = '/api/users';
     this.regionsEndpoint = '/api/regions';
     this.islandsEndpoint = '/api/islands';
-    this.regionsAndIslandsEndpoint = '/api/regions/{regionId}/islands';
+    this.regionsAndIslandsEndpoint = '/api/regions/{parentId}/islands';
+    this.ratingsEndpoint = '/api/ratings';
+    this.islandsAndRatingsEndpoint = '/api/islands/{parentId}/ratings';
+    this.usersAndRatingsEndpoint = '/api/users/{parentId}/ratings';
     this.headers = {
       Authorization: ''
     };
@@ -35,134 +38,160 @@ class ApiService {
     return response;
   }
 
-  async createUser(user) {
+  /**
+   * Helper method for making post request to the api
+   * @param url the endpoint of the api
+   * @param resource the resource to be created
+   * @returns {Promise<*|*>} api response
+   */
+  async createResource(url, resource) {
     const postRequest = {
       method: 'post',
-      url: this.usersEndpoint,
-      payload: user,
+      url: url,
+      payload: resource,
       headers: this.headers
     };
     return await this.server.inject(postRequest);
   }
 
-  async getUsers() {
-    const getRequest = {
-      method: 'get',
-      url: this.usersEndpoint,
-      headers: this.headers
-    };
-    return await this.server.inject(getRequest);
-  }
-
-  async getUser(id) {
-    const getRequest = {
-      method: 'get',
-      url: this.usersEndpoint + '/' + id,
-      headers: this.headers
-    };
-    return await this.server.inject(getRequest);
-  }
-
-  async updateUser(id, user) {
-    const putRequest = {
-      method: 'put',
-      url: this.usersEndpoint + '/' + id,
-      payload: user,
-      headers: this.headers
-    };
-    return await this.server.inject(putRequest);
-  }
-
-  async deleteAllUsers() {
-    const deleteRequest = {
-      method: 'delete',
-      url: this.usersEndpoint,
-      headers: this.headers
-    };
-    return await this.server.inject(deleteRequest);
-  }
-
-  async deleteOneUser(id) {
-    const deleteRequest = {
-      method: 'delete',
-      url: this.usersEndpoint + '/' + id,
-      headers: this.headers
-    };
-    return await this.server.inject(deleteRequest);
-  }
-
-  async getRegions() {
-    const getRequest = {
-      method: 'get',
-      url: this.regionsEndpoint,
-      headers: this.headers
-    };
-    return await this.server.inject(getRequest);
-  }
-
-  async getRegion(id) {
-    const getRequest = {
-      method: 'get',
-      url: this.regionsEndpoint + '/' + id,
-      headers: this.headers
-    };
-    return await this.server.inject(getRequest);
-  }
-
-  async createIsland(island, regionId) {
+  /**
+   * Helper method for making post request to the api
+   * @param url the endpoint of the api
+   * @param parentId the unique identifier of the parent resource
+   * @param resource the resource to be created
+   * @returns {Promise<*|*>} api response
+   */
+  async createResourceForParent(url, parentId, resource) {
     const postRequest = {
       method: 'post',
-      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId),
-      payload: island,
+      url: url.replace('{parentId}', parentId),
+      payload: resource,
       headers: this.headers
     };
     return await this.server.inject(postRequest);
   }
 
-  async getIslands() {
+  /**
+   * Helper method for making get request to the api
+   * @param url the endpoint of the api
+   * @returns {Promise<*|*>} api response
+   */
+  async getAllResources(url) {
     const getRequest = {
       method: 'get',
-      url: this.islandsEndpoint,
+      url: url,
       headers: this.headers
     };
     return await this.server.inject(getRequest);
   }
 
-  async getIslandsByRegion(regionId) {
+  /**
+   * Helper method for making get request to the api
+   * @param url the endpoint of the api
+   * @param parentId the unique identifier of the parent resource
+   * @returns {Promise<*|*>}
+   */
+  async getAllResourcesForParent(url, parentId) {
     const getRequest = {
       method: 'get',
-      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId),
+      url: url.replace('{parentId}', parentId),
       headers: this.headers
     };
     return await this.server.inject(getRequest);
   }
 
-  async updateIsland(island, regionId, islandId) {
+  /**
+   * Helper method for making get request to the api
+   * @param url the endpoint of the api
+   * @param id the unique identifier of the resource
+   * @returns {Promise<*|*>} api response
+   */
+  async getResource(url, id) {
+    const getRequest = {
+      method: 'get',
+      url: url + '/' + id,
+      headers: this.headers
+    };
+    return await this.server.inject(getRequest);
+  }
+
+  /**
+   * Helper method for making put request to the api
+   * @param url the endpoint of the api
+   * @param id the unique identifier of the resource
+   * @param resource the resource to be updated
+   * @returns {Promise<*|*>}
+   */
+  async updateResource(url, id, resource) {
     const putRequest = {
       method: 'put',
-      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId) + "/" + islandId,
-      payload: island,
+      url: url + '/' + id,
+      payload: resource,
       headers: this.headers
     };
     return await this.server.inject(putRequest);
   }
 
-  async deleteAllIslands() {
+  /**
+   * Helper method for making put request to the api
+   * @param url the endpoint of the api
+   * @param parentId the unique identifier of the parent resource
+   * @param id the unique identifier of the resource
+   * @param resource the resource to be updated
+   * @returns {Promise<*|*>}
+   */
+  async updateResourceForParent(url, parentId, id, resource) {
+    const putRequest = {
+      method: 'put',
+      url: url.replace('{parentId}', parentId) + '/' + id,
+      payload: resource,
+      headers: this.headers
+    };
+    return await this.server.inject(putRequest);
+  }
+
+  /**
+   * Helper method for making delete request to the api
+   * @param url the endpoint of the api
+   * @returns {Promise<*|*>} api response
+   */
+  async deleteAllResources(url) {
     const deleteRequest = {
       method: 'delete',
-      url: this.islandsEndpoint,
+      url: url,
       headers: this.headers
     };
     return await this.server.inject(deleteRequest);
   }
 
-  async deleteIslandsByRegion(regionId) {
-    const getRequest = {
+  /**
+   * Helper method for making delete request to the api
+   * @param url the endpoint of the api
+   * @param parentId the unique identifier of the parent resource
+   * @returns {Promise<*|*>}
+   */
+  async deleteAllResourcesForParent(url, parentId) {
+    const deleteRequest = {
       method: 'delete',
-      url: this.regionsAndIslandsEndpoint.replace("{regionId}", regionId),
+      url: url.replace('{parentId}', parentId),
       headers: this.headers
     };
-    return await this.server.inject(getRequest);
+    return await this.server.inject(deleteRequest);
+  }
+
+  /**
+   * Helper method for making delete request to the api
+   * @param url the endpoint of the api
+   * @param id the unique identifier of the resource
+   * @returns {Promise<*|*>} api response
+   */
+  async deleteOneResource(url, id) {
+    const deleteRequest = {
+      method: 'delete',
+      url: url + '/' + id,
+      headers: this.headers
+    };
+    return await this.server.inject(deleteRequest);
   }
 }
 

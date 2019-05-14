@@ -43,7 +43,7 @@ const swaggerOptions = {
     title: 'POI Islands of Ireland API Documentation',
     version: Pack.version
   },
-  tags: [{ name: 'users' }, { name: 'regions' }, { name: 'islands' }, { name: 'admin' }],
+  tags: [{ name: 'users' }, { name: 'regions' }, { name: 'islands' }, { name: 'ratings' }, { name: 'admin' }],
   grouping: 'tags',
   sortEndpoints: 'method',
   securityDefinitions: {
