@@ -22,6 +22,7 @@ const server = Hapi.server({
   host: 'localhost',
   port: 3000,
   routes: {
+    cors: true,
     validate: {
       options: {
         abortEarly: false
