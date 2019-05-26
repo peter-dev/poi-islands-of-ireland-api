@@ -3,7 +3,7 @@ const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const Region = require('../models/region');
 const Island = require('../models/island');
-const { ApiIslandSchema, ApiRegionIslandIdParamSchema, SwaggerIslandSchema } = require('../schemas/island');
+const { ApiIslandSchema, ApiRegionIslandIdParamSchema, ApiIslandIdParamSchema, SwaggerIslandSchema } = require('../schemas/island');
 const { ApiRegionIdParamSchema } = require('../schemas/region');
 
 const Islands = {
@@ -36,6 +36,8 @@ const Islands = {
           return Boom.notFound('No Region with this id');
         }
         const newIsland = new Island(request.payload);
+        // fix to support the client app as it has no access to user id, obtain user id from the token
+        newIsland.createdBy = request.auth.credentials.id;
         newIsland.region = region._id;
         const island = await newIsland.save();
         if (!island) {
@@ -66,6 +68,39 @@ const Islands = {
     },
     handler: async function(request, h) {
       return await Island.find();
+    }
+  },
+
+  findOne: {
+    // swagger properties
+    description: 'Find island by id',
+    tags: ['api', 'islands'],
+    plugins: {
+      'hapi-swagger': {
+        responses: {
+          '200': {
+            description: 'Success',
+            schema: SwaggerIslandSchema
+          },
+          '400': { description: 'Bad Request' },
+          '404': { description: 'Not Found' }
+        }
+      }
+    },
+    // validate the parameters against the Joi schema
+    validate: {
+      params: ApiIslandIdParamSchema
+    },
+    handler: async function(request, h) {
+      try {
+        const island = await Island.findById(request.params.id);
+        if (!island) {
+          return Boom.notFound('No Island with this id');
+        }
+        return island;
+      } catch (err) {
+        return Boom.badRequest('Invalid id');
+      }
     }
   },
 

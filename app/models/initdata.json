@@ -118,5 +118,53 @@
       "region": "->regions.northWest",
       "createdBy": "->users.homer"
     }
+  },
+  "ratings": {
+    "_model": "Rating",
+    "r1u1": {
+      "score": "5",
+      "island": "->islands.Lough-Foyle-Island",
+      "user": "->users.homer"
+    },
+    "r2u1": {
+      "score": "4",
+      "island": "->islands.Colt-Island",
+      "user": "->users.homer"
+    },
+    "r3u1": {
+      "score": "3",
+      "island": "->islands.Little-Saltee-Island",
+      "user": "->users.homer"
+    },
+    "r1u2": {
+      "score": "4",
+      "island": "->islands.Lough-Foyle-Island",
+      "user": "->users.marge"
+    },
+    "r2u2": {
+      "score": "4",
+      "island": "->islands.Colt-Island",
+      "user": "->users.marge"
+    },
+    "r3u2": {
+      "score": "3",
+      "island": "->islands.Little-Saltee-Island",
+      "user": "->users.marge"
+    },
+    "r1u3": {
+      "score": "3",
+      "island": "->islands.Lough-Foyle-Island",
+      "user": "->users.bart"
+    },
+    "r2u3": {
+      "score": "3",
+      "island": "->islands.Colt-Island",
+      "user": "->users.bart"
+    },
+    "r3u3": {
+      "score": "2",
+      "island": "->islands.Little-Saltee-Island",
+      "user": "->users.bart"
+    }
   }
 }

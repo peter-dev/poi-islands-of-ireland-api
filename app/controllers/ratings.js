@@ -34,7 +34,9 @@ const Ratings = {
     },
     handler: async function(request, h) {
       try {
-        const user = await User.findById(request.payload.user);
+        // fix to support the client app as it has no access to user id, obtain user id from the token
+        //const user = await User.findById(request.payload.user);
+        const user = await User.findById(request.auth.credentials.id);
         if (!user) {
           return Boom.notFound('No User with this id');
         }
@@ -47,6 +49,8 @@ const Ratings = {
           return Boom.badRequest('Rating with this user for this island already exist');
         }
         const newRating = new Rating(request.payload);
+        // fix to support the client app as it has no access to user id, obtain user id from the token
+        newRating.user = request.auth.credentials.id;
         const rating = await newRating.save();
         if (!rating) {
           return Boom.badImplementation('Error creating rating');

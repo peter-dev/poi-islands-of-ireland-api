@@ -102,6 +102,37 @@ suite('Islands API endpoints', function() {
     assert.equal(payload.length, 1);
   });
 
+  test('GET /islands/{id} | valid id -> 200 OK', async function() {
+    const responseUser = await apiService.createResource(apiService.usersEndpoint, newUser);
+    const payloadUser = JSON.parse(responseUser.payload);
+    const userId = payloadUser._id;
+    await apiService.authenticate(newUser);
+    const newIslandRequest = Object.assign({}, newIsland, {createdBy: userId});
+    const responseRegions = await apiService.getAllResources(apiService.regionsEndpoint);
+    const payloadRegions = JSON.parse(responseRegions.payload);
+    const regionId = payloadRegions[0]._id;
+    const responseCreate = await apiService.createResourceForParent(apiService.regionsAndIslandsEndpoint, regionId, newIslandRequest);
+    const payloadCreate = JSON.parse(responseCreate.payload);
+    const response = await apiService.getResource(apiService.islandsEndpoint, payloadCreate._id);
+    const payload = JSON.parse(response.payload);
+    assert.equal(response.statusCode, 200);
+    assert.deepOwnInclude(payloadCreate, payload);
+  });
+
+  test('GET /islands/{id} | invalid id -> 400 Bad Request', async function() {
+    await apiService.createResource(apiService.usersEndpoint, newUser);
+    await apiService.authenticate(newUser);
+    const response = await apiService.getResource(apiService.islandsEndpoint, '1234');
+    assert.equal(response.statusCode, 400);
+  });
+
+  test('GET /islands/{id} | valid id -> 404 Not Found', async function() {
+    await apiService.createResource(apiService.usersEndpoint, newUser);
+    await apiService.authenticate(newUser);
+    const response = await apiService.getResource(apiService.islandsEndpoint, '012345678901234567890123');
+    assert.equal(response.statusCode, 404);
+  });
+
   test('GET /regions/{id}/islands | valid region id -> 200 OK', async function() {
     const responseUser = await apiService.createResource(apiService.usersEndpoint, newUser);
     const payloadUser = JSON.parse(responseUser.payload);

@@ -18,6 +18,7 @@ module.exports = [
 
   { method: 'POST', path: '/api/regions/{id}/islands', config: Islands.create },
   { method: 'GET', path: '/api/islands', config: Islands.findAll },
+  { method: 'GET', path: '/api/islands/{id}', config: Islands.findOne },
   { method: 'GET', path: '/api/regions/{id}/islands', config: Islands.findByRegion },
   { method: 'PUT', path: '/api/regions/{region_id}/islands/{island_id}', config: Islands.update },
   { method: 'DELETE', path: '/api/islands', config: Islands.deleteAll },

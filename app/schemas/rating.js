@@ -25,7 +25,7 @@ const ApiRatingSchema = Joi.object({
   user: Joi.string()
     .alphanum()
     .length(24)
-    .required()
+    //.required()
     .example('012345678901234567890123')
 }).label('New Rating');
 

@@ -9,6 +9,7 @@ async function seed() {
   const User = require('./user');
   const Region = require('./region');
   const Island = require('./island');
+  const Rating = require('./rating');
   const dbData = await seeder.seed(data, { dropDatabase: false, dropCollections: true });
   console.log(dbData);
 }

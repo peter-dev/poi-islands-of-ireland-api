@@ -34,7 +34,7 @@ const ApiIslandSchema = Joi.object({
   createdBy: Joi.string()
     .alphanum()
     .length(24)
-    .required()
+    //.required()
     .example('012345678901234567890123')
 }).label('New Island');
 
