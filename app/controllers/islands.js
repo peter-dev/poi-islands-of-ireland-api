@@ -163,8 +163,8 @@ const Islands = {
     },
     handler: async function(request, h) {
       try {
-        const region = await Region.findById(request.params.region_id);
-        if (!region) {
+        const regionId = await Region.findById(request.params.region_id);
+        if (!regionId) {
           return Boom.notFound('No Region with this id');
         }
         const island = await Island.findById(request.params.island_id);
@@ -172,11 +172,12 @@ const Islands = {
           return Boom.notFound('No Island with this id');
         }
         // es6 syntax
-        const { name, description, location } = request.payload;
+        const { name, description, location, region } = request.payload;
         const attributes = {
           name: name,
           description: description,
-          location: location
+          location: location,
+          region: region || regionId
         };
         // options: { new: true } => return the modified document rather than the original
         const updatedIsland = await Island.findOneAndUpdate({ _id: request.params.island_id }, attributes, { new: true });

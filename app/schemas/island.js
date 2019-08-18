@@ -35,7 +35,12 @@ const ApiIslandSchema = Joi.object({
     .alphanum()
     .length(24)
     //.required()
-    .example('012345678901234567890123')
+    .example('012345678901234567890123'),
+  region: Joi.string()
+    .alphanum()
+    .length(24)
+    //.required()
+    .example('012345678901234567890123'),
 }).label('New Island');
 
 // joi id param schema for api validation
