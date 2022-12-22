@@ -38,7 +38,7 @@
     "hapi": "^18.1.0",
     "hapi-auth-jwt2": "^8.4.0",
     "hapi-swagger": "^9.4.2",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.11",
     "mais-mongoose-seeder": "^1.0.7",
     "mongoose": "^5.4.20"
